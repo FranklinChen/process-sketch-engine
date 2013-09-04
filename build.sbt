@@ -22,7 +22,7 @@ libraryDependencies += "org.scala-lang" % "jline" % "2.10.2"
 
 // command line and logging
 libraryDependencies ++= Seq(
-  "org.rogach" %% "scallop" % "0.9.3",
+  "org.rogach" %% "scallop" % "0.9.4",
   "com.typesafe" %% "scalalogging-slf4j" % "1.0.1"
 )
 
@@ -43,7 +43,7 @@ libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.5"
 
 libraryDependencies += "com.github.theon" %% "scala-uri" % "0.3.5"
 
-libraryDependencies += "org.mapdb" % "mapdb" % "0.9.3"
+libraryDependencies += "org.mapdb" % "mapdb" % "0.9.5"
 
 libraryDependencies ++= Seq(
   "com.google.gdata.gdata-java-client" % "gdata-spreadsheet-3.0" % "1.47.1",
@@ -52,7 +52,7 @@ libraryDependencies ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.10.1" % "test",
-  "org.specs2" %% "specs2" % "2.1.1" % "test"
+  "org.specs2" %% "specs2" % "2.2" % "test"
 )
 
 resolvers += Classpaths.typesafeReleases

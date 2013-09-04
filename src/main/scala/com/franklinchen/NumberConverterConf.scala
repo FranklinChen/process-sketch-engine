@@ -16,7 +16,7 @@ object NumberConverterConf {
         Right(Some(SpreadsheetKey(key)))
       case Nil => Right(None)
       case _ =>
-        Left(Unit)
+        Left("bad spreadsheet key")
     }
 
     override val tag = scala.reflect.runtime.universe.typeTag[SpreadsheetKey]
