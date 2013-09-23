@@ -141,7 +141,7 @@ class Lookup(username: String,
       val json = parse(jsonStream)
       ((json \ "Lines")(0) \ "toknum").extract[Toknum].right
     } catch {
-      case t: Throwable => t.getMessage.left
+      case t: Throwable => (t.getMessage + ": toknum").left
     } finally {
       jsonStream.close()
     }
@@ -163,7 +163,7 @@ class Lookup(username: String,
       val json = parse(jsonStream)
       (json \ "doc_url").extract[String].right
     } catch {
-      case t: Throwable => t.getMessage.left
+      case t: Throwable => (t.getMessage + ": doc_url").left
     } finally {
       jsonStream.close()
     }
