@@ -1,5 +1,8 @@
 package com.franklinchen
 
+import scalaz._
+import Scalaz._
+
 import scala.collection.mutable.{Buffer, Seq => MutableSeq}
 import scala.collection.JavaConversions._
 import com.github.theon.uri.Uri.parseUri
@@ -121,12 +124,15 @@ class NumberConverter(username: String,
           case docnumRegex(docnumString) =>
             logger.info(s"saw $docnumString")
             val docnum = docnumString.toInt
-            lookup.findUrl(corpus, docnum) match {
-              case None =>
-                val message = s"$corpus, $docnum: failed to find, ignoring"
+            lookup.findUrl(corpus, docnum).fold(
+              {
+                m =>
+                val message = s"$corpus, $docnum: failed to find, ignoring: $m"
                 logger.info(message)
                 (us :+ docnum, bs)
-              case Some(url) =>
+              },
+              {
+                url =>
                 val idString = s"${cellFeedUrl}/R${row}C${col}"
                 val batchEntry = new CellEntry(row, col, url)
                 batchEntry.setId(idString)
@@ -136,7 +142,8 @@ class NumberConverter(username: String,
                 BatchUtils.setBatchOperationType(batchEntry,
                   BatchOperationType.UPDATE)
                 (us, bs :+ batchEntry)
-            }
+              }
+            )
           case _ =>
             // Do nothing
             (us, bs)

@@ -14,12 +14,12 @@ class LookupSpec extends Specification { def is = s2"""
   val lookup = new Lookup(username, password, strictTrust)
 
   def e1 = {
-    lookup.findUrl("ententen12_1", 1048268) must beSome(
+    lookup.findUrl("ententen12_1", 1048268).toEither must beRight(
       "http://libcom.org/book/export/html/1426"
     )
   }
 
   def e2 = {
-    lookup.findUrl("ententen12_1", 999999999) must beNone
+    lookup.findUrl("ententen12_1", 999999999).toEither must beLeft
   }
 }

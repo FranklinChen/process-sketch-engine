@@ -1,5 +1,8 @@
 package com.franklinchen
 
+import scalaz._
+import Scalaz._
+
 import org.apache.http.client.fluent._
 import org.apache.http.client.utils.URIBuilder
 import org.apache.http.impl.client.{HttpClientBuilder,LaxRedirectStrategy}
@@ -7,6 +10,7 @@ import org.apache.http.impl.client.{HttpClientBuilder,LaxRedirectStrategy}
 import org.json4s._
 import org.json4s.native.JsonMethods.{parse,compact,render}
 import org.json4s.JsonDSL._
+
 
 import org.mapdb.DBMaker
 import scala.collection.JavaConversions._
@@ -100,38 +104,29 @@ class Lookup(username: String,
     executor
   }
 
-  def findToknum(corpus: String, docnum: Docnum): Option[Toknum] =
-    toknumCache.get((corpus, docnum)) match {
-      case yes @ Some(_) => yes
-      case None =>
-        rawFindToknum(corpus, docnum) match {
-          case result @ Some(computed) =>
-            logger.info(s"storing into toknum cache for $corpus, $docnum")
-            toknumCache((corpus, docnum)) = computed
-            db.commit()
-            result
-          case None =>
-            None
-        }
-    }
+  def findToknum(corpus: String, docnum: Docnum): String \/ Toknum =
+    toknumCache.get((corpus, docnum)).fold({
+      rawFindToknum(corpus, docnum) map {
+        computed =>
+        logger.info(s"storing into toknum cache for $corpus, $docnum")
+        toknumCache((corpus, docnum)) = computed
+        db.commit()
+        computed
+      }
+    })(_.right)
 
-  def findUrl(corpus: String, toknum: Docnum): Option[String] =
-    urlCache.get((corpus, toknum)) match {
-      case yes @ Some(_) => yes
-      case None =>
-        rawFindUrl(corpus, toknum) match {
-          case result @ Some(computed) =>
-            logger.info(s"storing into url cache for $corpus, $toknum")
-            urlCache((corpus, toknum)) = computed
-            db.commit()
-            result
-          case None =>
-            None
-        }
-    }
-    
+  def findUrl(corpus: String, toknum: Docnum): String \/ String =
+    urlCache.get((corpus, toknum)).fold({
+      rawFindUrl(corpus, toknum) map {
+        computed =>
+        logger.info(s"storing into url cache for $corpus, $toknum")
+        urlCache((corpus, toknum)) = computed
+        db.commit()
+        computed
+      }
+    })(_.right)
 
-  def rawFindToknum(corpus: String, docnum: Docnum): Option[Toknum] = {
+  def rawFindToknum(corpus: String, docnum: Docnum): String \/ Toknum = {
     val url = new URIBuilder(firstUrl).
       addParameter("corpname", corpus).
       addParameter("queryselector", "cqlrow").
@@ -144,14 +139,15 @@ class Lookup(username: String,
 
     try {
       val json = parse(jsonStream)
-      val toknum = ((json \ "Lines")(0) \ "toknum").extractOpt[Toknum]
-      toknum
+      ((json \ "Lines")(0) \ "toknum").extract[Toknum].right
+    } catch {
+      case t: Throwable => t.getMessage.left
     } finally {
       jsonStream.close()
     }
   }
 
-  def rawFindUrl(corpus: String, docnum: Docnum): Option[String] = {
+  def rawFindUrl(corpus: String, docnum: Docnum): String \/ String = {
     val toknum = findToknum(corpus, docnum)
 
     val url = new URIBuilder(fullrefUrl).
@@ -165,7 +161,9 @@ class Lookup(username: String,
 
     try {
       val json = parse(jsonStream)
-      (json \ "doc_url").extractOpt[String]
+      (json \ "doc_url").extract[String].right
+    } catch {
+      case t: Throwable => t.getMessage.left
     } finally {
       jsonStream.close()
     }

@@ -26,6 +26,8 @@ libraryDependencies ++= Seq(
   "com.typesafe" %% "scalalogging-slf4j" % "1.0.1"
 )
 
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.0.3"
+
 {
   val logbackVersion = "1.0.13"
   libraryDependencies ++= Seq(
