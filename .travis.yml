@@ -1,0 +1,13 @@
+language: scala
+scala:
+- 2.10.2
+jdk:
+- oraclejdk7
+- openjdk6
+script: sbt ++$TRAVIS_SCALA_VERSION test
+env:
+  global:
+  - secure: C8bwGkOBvQDVLvzmsqhE3BW9qYHa4YdJUkkER4zR5v8cBFNfjXuDtHhCMdfAS3gfWSIMfkBho8gTBxhd6JcmeL/2IL81CoklsStJ+kqOW46zr3ADeLLwz7ZNpyqVXzmWqUOcZ5NrwtHtMON+H4g6ap8xdPANt3K4oqp8I7ev7Ec=
+  - secure: YuVLXlsK9z7oGJua2C6BafdQFGLsePlfLii7KsRRhwqcSkq4jvmhWpAYL1xiYUupBB4M/OpenbVdPngt6JLAhl+0rI/Sacn2JM/OtN507WFdGa48TRk/Qg3NXB0DkAbKIhVu1nWZNGb9j3prKVt/Ho7GBPKjyMOqnYz+W0glasU=
+  - secure: NqSwZDCSPjmA/B4wNyGeY36Xi2x+w74Qc6sVes/ILzvw8vg70wI5uqMt3+4yPDhFHyJgZdAFflhgdoCHVXsw/gS4natTlNX371H3PU3OdRXuN917x6rMK/ZzG7R6ek0G+/u5cwjKuFKkKX/nbM+BFuCUGVJrfhT48zwVFVl1twE=
+  - secure: NcJ/sYvYXRIjAsq5MmSUPFYusW08emlIEEK2RHE5vweQsSwgHF1dDfgDRjLEfGUKkMCM3x/CFpMwFB/uE4dO3+GN8Rk60Z3DMc4lSM/SJugPsT39CYdAbtc+s+E2wJGyfqWmqzCvjvsWiwGTDXYtYhaBRcgXMnfgpUhBdUUyUfo=
