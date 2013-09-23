@@ -36,23 +36,23 @@ libraryDependencies ++= Seq(
 
 // HTTP Components 4.x
 libraryDependencies ++= Seq(
-  "org.apache.httpcomponents" % "fluent-hc" % "4.3-beta2"
+  "org.apache.httpcomponents" % "fluent-hc" % "4.3"
 )
 
 libraryDependencies += "org.json4s" %% "json4s-native" % "3.2.5"
 
-libraryDependencies += "com.github.theon" %% "scala-uri" % "0.3.5"
+libraryDependencies += "com.github.theon" %% "scala-uri" % "0.3.6"
 
 libraryDependencies += "org.mapdb" % "mapdb" % "0.9.5"
 
 libraryDependencies ++= Seq(
   "com.google.gdata.gdata-java-client" % "gdata-spreadsheet-3.0" % "1.47.1",
-  "com.google.oauth-client" % "google-oauth-client" % "1.16.0-rc"
+  "com.google.oauth-client" % "google-oauth-client" % "1.17.0-rc"
 )
 
 libraryDependencies ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.10.1" % "test",
-  "org.specs2" %% "specs2" % "2.2" % "test"
+  "org.specs2" %% "specs2" % "2.2.2" % "test"
 )
 
 resolvers += Classpaths.typesafeReleases
