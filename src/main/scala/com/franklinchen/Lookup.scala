@@ -8,7 +8,7 @@ import org.apache.http.client.utils.URIBuilder
 import org.apache.http.impl.client.{HttpClientBuilder,LaxRedirectStrategy}
 
 import org.json4s._
-import org.json4s.native.JsonMethods.{parse,compact,render}
+import org.json4s.native.JsonMethods.{parse,compact,pretty,render}
 import org.json4s.JsonDSL._
 
 
@@ -148,24 +148,28 @@ class Lookup(username: String,
   }
 
   def rawFindUrl(corpus: String, docnum: Docnum): String \/ String = {
-    val toknum = findToknum(corpus, docnum)
+    findToknum(corpus, docnum) match {
+      case -\/(e) => e.left
+      case \/-(toknum) =>
+        val url = new URIBuilder(fullrefUrl).
+          addParameter("corpname", corpus).
+          addParameter("pos", toknum.toString).
+          addParameter("format", "json").
+          build()
+        //logger.info(s"url: $url")
+        val jsonStream = executor.execute(
+          Request.Get(url)
+        ).returnContent().asStream()
 
-    val url = new URIBuilder(fullrefUrl).
-      addParameter("corpname", corpus).
-      addParameter("pos", toknum.toString).
-      addParameter("format", "json").
-      build()
-    val jsonStream = executor.execute(
-      Request.Get(url)
-    ).returnContent().asStream()
-
-    try {
-      val json = parse(jsonStream)
-      (json \ "doc_url").extract[String].right
-    } catch {
-      case t: Throwable => (t.getMessage + ": doc_url").left
-    } finally {
-      jsonStream.close()
+        try {
+          val json = parse(jsonStream)
+          //logger.info(s"rawFindUrl json: ${pretty(render(json))}")
+          (json \ "doc_url").extract[String].right
+        } catch {
+          case t: Throwable => (t.getMessage + ": doc_url").left
+        } finally {
+          jsonStream.close()
+        }
     }
   }
 }
