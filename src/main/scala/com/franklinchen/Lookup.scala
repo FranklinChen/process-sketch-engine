@@ -12,10 +12,8 @@ import org.json4s.native.JsonMethods.{parse,compact,pretty,render}
 import org.json4s.JsonDSL._
 
 
-import org.mapdb.DBMaker
 import scala.collection.JavaConversions._
 import java.io.File
-import scala.collection.mutable.{Map => MutableMap}
 
 import com.typesafe.scalalogging.slf4j.Logging
 
@@ -27,18 +25,6 @@ object Lookup {
   type Corpus = String
   type Docnum = Int
   type Toknum = Int
-
-  val dbPath = new File(sys.env("HOME"), ".sketch_engine_cache")
-
-  val db = DBMaker.newFileDB(dbPath).
-    closeOnJvmShutdown().
-    make()
-
-  val toknumCache: MutableMap[(Corpus, Docnum), Toknum] =
-    db.getHashMap[(Corpus, Docnum), Toknum]("toknum")
-
-  val urlCache: MutableMap[(Corpus, Toknum), String] =
-    db.getHashMap[(Corpus, Toknum), String]("url")
 
   val host = "https://beta.sketchengine.co.uk"
 
@@ -104,29 +90,7 @@ class Lookup(username: String,
     executor
   }
 
-  def findToknum(corpus: String, docnum: Docnum): String \/ Toknum =
-    toknumCache.get((corpus, docnum)).fold({
-      rawFindToknum(corpus, docnum) map {
-        computed =>
-        logger.info(s"storing into toknum cache for $corpus, $docnum")
-        toknumCache((corpus, docnum)) = computed
-        db.commit()
-        computed
-      }
-    })(_.right)
-
-  def findUrl(corpus: String, toknum: Docnum): String \/ String =
-    urlCache.get((corpus, toknum)).fold({
-      rawFindUrl(corpus, toknum) map {
-        computed =>
-        logger.info(s"storing into url cache for $corpus, $toknum")
-        urlCache((corpus, toknum)) = computed
-        db.commit()
-        computed
-      }
-    })(_.right)
-
-  def rawFindToknum(corpus: String, docnum: Docnum): String \/ Toknum = {
+  def findToknum(corpus: String, docnum: Docnum): String \/ Toknum = {
     val url = new URIBuilder(firstUrl).
       addParameter("corpname", corpus).
       addParameter("queryselector", "cqlrow").
@@ -147,7 +111,7 @@ class Lookup(username: String,
     }
   }
 
-  def rawFindUrl(corpus: String, docnum: Docnum): String \/ String = {
+  def findUrl(corpus: String, docnum: Docnum): String \/ String = {
     findToknum(corpus, docnum) match {
       case -\/(e) => e.left
       case \/-(toknum) =>
