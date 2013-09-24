@@ -14,6 +14,7 @@ import org.json4s.JsonDSL._
 
 import scala.collection.JavaConversions._
 import java.io.File
+import java.io.InputStream
 
 import com.typesafe.scalalogging.slf4j.Logging
 
@@ -97,17 +98,20 @@ class Lookup(username: String,
       addParameter("cql", s"<doc#$docnum>").
       addParameter("format", "json").
       build()
-    val jsonStream = executor.execute(
-      Request.Get(url)
-    ).returnContent().asStream()
-
+    var jsonStream: InputStream = null
     try {
+      jsonStream = executor.execute(
+        Request.Get(url)
+      ).returnContent().asStream()
+
       val json = parse(jsonStream)
       ((json \ "Lines")(0) \ "toknum").extract[Toknum].right
     } catch {
       case t: Throwable => (t.getMessage + ": toknum").left
     } finally {
-      jsonStream.close()
+      if (jsonStream != null) {
+        jsonStream.close()
+      }
     }
   }
 
@@ -121,18 +125,21 @@ class Lookup(username: String,
           addParameter("format", "json").
           build()
         //logger.info(s"url: $url")
-        val jsonStream = executor.execute(
-          Request.Get(url)
-        ).returnContent().asStream()
-
+        var jsonStream: InputStream = null
         try {
+          jsonStream = executor.execute(
+            Request.Get(url)
+          ).returnContent().asStream()
+
           val json = parse(jsonStream)
           //logger.info(s"rawFindUrl json: ${pretty(render(json))}")
           (json \ "doc_url").extract[String].right
         } catch {
           case t: Throwable => (t.getMessage + ": doc_url").left
         } finally {
-          jsonStream.close()
+          if (jsonStream != null) {
+            jsonStream.close()
+          }
         }
     }
   }
