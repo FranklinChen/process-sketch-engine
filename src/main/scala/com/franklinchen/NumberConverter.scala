@@ -85,7 +85,7 @@ class NumberConverter(username: String,
   /**
     @return List of failures
     */
-  def doConversion(corpus: String, key: String): (Seq[Int], Seq[String]) = {
+  def doConversion(corpus: String, key: String): (Seq[String], Seq[String]) = {
     // TODO Can we assume using only the first worksheet?
     // "od6" is the first worksheet
     val cellFeedUrl = urlFactory.getCellFeedUrl(key,
@@ -110,10 +110,10 @@ class NumberConverter(username: String,
     // Use the optimized batch update.
     val cellEntries = cellFeed.getEntries()
     val (unfoundDocnums, batchEntries) = (
-      (Seq[Int](), Buffer[CellEntry]()) /:
+      (Seq[String](), Buffer[CellEntry]()) /:
         cellEntries
     ) {
-      (p: (Seq[Int], Buffer[CellEntry]), cellEntry: CellEntry) => {
+      (p: (Seq[String], Buffer[CellEntry]), cellEntry: CellEntry) => {
         val (us, bs) = p
         val cell = cellEntry.getCell()
         assert(cell != null)
@@ -121,9 +121,8 @@ class NumberConverter(username: String,
         val col = cell.getCol()
 
         cell.getValue() match {
-          case docnumRegex(docnumString) =>
-            logger.info(s"saw $docnumString")
-            val docnum = docnumString.toInt
+          case docnumRegex(docnum) =>
+            logger.info(s"saw $docnum")
             lookup.findUrl(corpus, docnum).fold(
               {
                 m =>

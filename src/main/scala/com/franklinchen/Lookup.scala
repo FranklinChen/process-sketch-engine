@@ -24,8 +24,8 @@ import com.typesafe.scalalogging.slf4j.Logging
  */
 object Lookup {
   type Corpus = String
-  type Docnum = Int
-  type Toknum = Int
+  type Docnum = String
+  type Toknum = String
 
   val host = "https://beta.sketchengine.co.uk"
 

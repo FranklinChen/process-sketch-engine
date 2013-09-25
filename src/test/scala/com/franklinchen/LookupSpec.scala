@@ -9,6 +9,8 @@ class LookupSpec extends Specification { def is = s2"""
     findToknum succeeds on good doc number $e1
     lookupUrl succeeds on good doc number $e2
     lookupUrl fails on bad doc number     $e3
+
+    lookupUrl succeeds on good doc number $e4
   """
   import LookupEnv._
 
@@ -17,18 +19,24 @@ class LookupSpec extends Specification { def is = s2"""
 
 
   def e1 = {
-    lookup.findToknum("ententen12_1", 1048268).toEither must beRight(
-      747708013
+    lookup.findToknum("ententen12_1", "1048268").toEither must beRight(
+      "747708013"
     )
   }
 
   def e2 = {
-    lookup.findUrl("ententen12_1", 1048268).toEither must beRight(
+    lookup.findUrl("ententen12_1", "1048268").toEither must beRight(
       "http://libcom.org/book/export/html/1426"
     )
   }
 
   def e3 = {
-    lookup.findUrl("ententen12_1", 999999999).toEither must beLeft
+    lookup.findUrl("ententen12_1", "999999999").toEither must beLeft
+  }
+
+  def e4 = {
+    lookup.findUrl("ententen12_1", "10370981").toEither must beRight(
+      "http://www.lastsuperpower.net/docs/celeb-poverty/view"
+    )
   }
 }
